@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.Toast;
 
 import java.util.Collections;
@@ -20,13 +21,14 @@ import uk.co.ribot.androidboilerplate.data.model.Ribot;
 import uk.co.ribot.androidboilerplate.ui.base.BaseActivity;
 import uk.co.ribot.androidboilerplate.util.DialogFactory;
 
-public class MainActivity extends BaseActivity implements MainMvpView {
+public class MainActivity extends BaseActivity implements MainMvpView, View.OnClickListener{
 
     private static final String EXTRA_TRIGGER_SYNC_FLAG =
             "uk.co.ribot.androidboilerplate.ui.main.MainActivity.EXTRA_TRIGGER_SYNC_FLAG";
 
     @Inject MainPresenter mMainPresenter;
-    @Inject RibotsAdapter mRibotsAdapter;
+//    @Inject RibotsAdapter mRibotsAdapter;
+    RibotsAdapter mRibotsAdapter;
 
     @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
 
@@ -48,6 +50,7 @@ public class MainActivity extends BaseActivity implements MainMvpView {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        mRibotsAdapter = new RibotsAdapter(this);
         mRecyclerView.setAdapter(mRibotsAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mMainPresenter.attachView(this);
@@ -86,4 +89,15 @@ public class MainActivity extends BaseActivity implements MainMvpView {
         Toast.makeText(this, R.string.empty_ribots, Toast.LENGTH_LONG).show();
     }
 
+
+    /**
+     * Called when a view has been clicked.
+     *
+     * @param v The view that was clicked.
+     */
+    @Override
+    public void onClick(View v) {
+        Toast.makeText(this, "Delete " + v.getId() + " " + v.getTag(), Toast.LENGTH_SHORT).show();
+
+    }
 }
