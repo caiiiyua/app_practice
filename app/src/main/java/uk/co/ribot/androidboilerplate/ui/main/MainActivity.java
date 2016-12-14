@@ -2,7 +2,11 @@ package uk.co.ribot.androidboilerplate.ui.main;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -32,6 +36,29 @@ public class MainActivity extends BaseActivity implements MainMvpView, View.OnCl
 
     @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
 
+    private View mContainerView;
+    private Snackbar mSnackBar;
+
+    private Handler mHandler = new Handler() {
+
+        /**
+         * Subclasses must implement this to receive messages.
+         *
+         * @param msg
+         */
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1: {
+//                    Snackbar.make(mContainerView, "Snackbar test...", Snackbar.LENGTH_LONG).show();
+                    mSnackBar.show();
+                    break;
+                }
+            }
+            super.handleMessage(msg);
+        }
+    };
+
     /**
      * Return an Intent to start this Activity.
      * triggerDataSyncOnCreate allows disabling the background sync service onCreate. Should
@@ -50,6 +77,8 @@ public class MainActivity extends BaseActivity implements MainMvpView, View.OnCl
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        mContainerView = findViewById(R.id.container_view);
+        mSnackBar = Snackbar.make(mContainerView, "Snackbar test...", Snackbar.LENGTH_SHORT);
         mRibotsAdapter = new RibotsAdapter(this);
         mRecyclerView.setAdapter(mRibotsAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -99,5 +128,53 @@ public class MainActivity extends BaseActivity implements MainMvpView, View.OnCl
     public void onClick(View v) {
         Toast.makeText(this, "Delete " + v.getId() + " " + v.getTag(), Toast.LENGTH_SHORT).show();
 
+    }
+
+    class TempAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        /**
+         * Override this method to perform a computation on a background thread. The
+         * specified parameters are the parameters passed to {@link #execute}
+         * by the caller of this task.
+         * <p>
+         * This method can call {@link #publishProgress} to publish updates
+         * on the UI thread.
+         *
+         * @param params The parameters of the task.
+         * @return A result, defined by the subclass of this task.
+         * @see #onPreExecute()
+         * @see #onPostExecute
+         * @see #publishProgress
+         */
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                while (true) {
+                    Thread.sleep(200);
+                    Message m = Message.obtain();
+                    m.what = 1;
+                    mHandler.sendMessageDelayed(m, 200);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        /**
+         * <p>Runs on the UI thread after {@link #doInBackground}. The
+         * specified result is the value returned by {@link #doInBackground}.</p>
+         * <p>
+         * <p>This method won't be invoked if the task was cancelled.</p>
+         *
+         * @param aVoid The result of the operation computed by {@link #doInBackground}.
+         * @see #onPreExecute
+         * @see #doInBackground
+         * @see #onCancelled(Object)
+         */
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
     }
 }
